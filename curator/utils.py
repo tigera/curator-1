@@ -36,7 +36,7 @@ def get_yaml(path):
     # Set the stage here to parse single scalar value environment vars from
     # the YAML file being read
     single = re.compile( r'^\$\{(.*)\}$' )
-    yaml.add_implicit_resolver ( "!single", single )
+    yaml.add_implicit_resolver ( "!single", single, Loader=yaml.SafeLoader)
     def single_constructor(loader,node):
         value = loader.construct_scalar(node)
         proto = single.match(value).group(1)
@@ -47,7 +47,7 @@ def get_yaml(path):
             envvar = proto
         return os.environ[envvar] if envvar in os.environ else default
 
-    yaml.add_constructor('!single', single_constructor)
+    yaml.add_constructor('!single', single_constructor, Loader=yaml.SafeLoader)
 
     try:
         return yaml.safe_load(read_file(path))
